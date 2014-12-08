@@ -457,6 +457,14 @@ sub processArgs {
       ($sourceHost, $sourceUser, $sourcePwd) = split(/\//, $opt_S);
    }
 
+   # We'll read the password from file
+   open(FILE, $sourceHost . "_" . $sourceUser) or die "Can't read file 'filename' [$!]\n";
+   local $/;
+   $document = <FILE>;
+   close (FILE);
+   $sourcePwd = $document;
+   $sourcePwd =~ s/^\s+|\s+$//g;
+
    $userid   = scalar getpwnam($opt_u) or -1;
    $groupid   = scalar getpwnam($opt_g) or -1;
    $maildir    = $opt_M;
