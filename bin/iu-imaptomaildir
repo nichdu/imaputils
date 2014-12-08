@@ -458,7 +458,9 @@ sub processArgs {
    }
 
    # We'll read the password from file
-   open(FILE, $sourceHost . "_" . $sourceUser) or die "Can't read file 'filename' [$!]\n";
+   $fname = "." . $sourceHost . "_" . $sourceUser;
+   print STDOUT "File name is " . $fname . "\n";
+   open(FILE, $fname) or die "Can't read file 'filename' [$!]\n";
    local $/;
    $document = <FILE>;
    close (FILE);
@@ -467,6 +469,7 @@ sub processArgs {
 
    $userid   = scalar getpwnam($opt_u) or -1;
    $groupid   = scalar getpwnam($opt_g) or -1;
+   $username   = $opt_u;
    $maildir    = $opt_M;
    $mbxList    = $opt_m;
    $logfile    = $opt_L;
@@ -607,8 +610,8 @@ my @subdirs = qw( new cur tmp );
       }
    }
 
-   my $stat = chown $userid, $groupid, $folder if $opt_u and $opt_g;   # Set ownership
-   if ( ! $stat ) {
+   my $stat = `chown -R $username "$folder" 2&>1`;
+   if ( $stat ) {
       Log("Failed to chown $username for $folder: $!");
       exit;
    }
